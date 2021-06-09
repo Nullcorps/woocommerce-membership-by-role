@@ -104,7 +104,10 @@ function remove_additional_billing_fields($fields) {
 function woo_postpay_membership2($orderid)
    {
 	global $nl;
-	
+	global $woo_member_magic_product_ids;
+   global $woo_member_disable_redirect;
+   global $woo_member_debug;
+   
    $out = "in Woo postpay membership2:" . $nl;
 	
 	//$orderid = "";
@@ -135,7 +138,13 @@ function woo_postpay_membership2($orderid)
 			$product_id = $item->get_product_id();
 			$out .= " (id: " . $product_id . ")</div>";
 			
-         if ($product_id == 1130)  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< HERE IS WHEREYOU SET THE PRODUCT IDS WHIC ARE SPECIAL/MEMBERSHIPS
+         $magic_id = 1;
+         
+         if ( is_numeric($woo_member_magic_product_ids) )
+            { $magic_id = $woo_member_magic_product_ids; }
+         
+         
+         if ( $product_id == $magic_id )  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< HERE IS WHEREYOU SET THE PRODUCT IDS WHIC ARE SPECIAL/MEMBERSHIPS
              {
             $out .= "Product is a membership, get duration and add to user field" . $nl;
             $userid = get_current_user_id();
@@ -206,23 +215,31 @@ function woo_postpay_membership2($orderid)
                $out .= "Current time: " . $current_time . $nl;
                $out .= "Current time (readable): " . date('d/m/Y H:i:s', $current_time) . $nl;
                
-               $expires_time = date(strtotime('+' . $duration_days . ' days', $current_time));
-               $out .= "Expires time: " . $expires_time . $nl;
-               $out .= "Expires time (readable): " . date('d/m/Y H:i:s', $expires_time) . $nl;
-					update_user_meta( $userid, 'membership_expires', $expires_time );
-					update_user_meta( $userid, 'membership_expires_order', $orderid );
-					update_user_meta( $userid, 'membership_expires_updated', $current_time );
- 
-					$out .= "Membership expiry details set" . $nl;
-					
-					$membership_expires = get_user_meta($userid, 'membership_expires', true);
-					$membership_expires_order = get_user_meta($userid, 'membership_expires_order', true);
-					$membership_expires_updated = get_user_meta($userid, 'membership_expires_updated', true);
-					
-					$out .= "Membership expires: " . $membership_expires . " - " . date('d/m/Y H:i:s', $membership_expires) . $nl; $nl;
-					$out .= "Membership expires order: " . $membership_expires_order . $nl;
-					$out .= "Membership expires updated: " . $membership_expires_updated . " - " . date('d/m/Y H:i:s', $membership_expires_updated) . $nl; 
+               $out .= "Duration to add: " . $duration_days . $nl;
                
+               if ( !is_numeric($duration_days) )
+                  {
+                  $out .= "WARNING: MISSING duration_days ATTRIBUTE FROM MAGIC PRODUCT" . $nl; 
+                  }
+               else
+                  {
+                  $expires_time = date(strtotime('+' . $duration_days . ' days', $current_time));
+                  $out .= "Expires time: " . $expires_time . $nl;
+                  $out .= "Expires time (readable): " . date('d/m/Y H:i:s', $expires_time) . $nl;
+                  update_user_meta( $userid, 'membership_expires', $expires_time );
+                  update_user_meta( $userid, 'membership_expires_order', $orderid );
+                  update_user_meta( $userid, 'membership_expires_updated', $current_time );
+    
+                  $out .= "Membership expiry details set" . $nl;
+                  
+                  $membership_expires = get_user_meta($userid, 'membership_expires', true);
+                  $membership_expires_order = get_user_meta($userid, 'membership_expires_order', true);
+                  $membership_expires_updated = get_user_meta($userid, 'membership_expires_updated', true);
+                  
+                  $out .= "Membership expires: " . $membership_expires . " - " . date('d/m/Y H:i:s', $membership_expires) . $nl; $nl;
+                  $out .= "Membership expires order: " . $membership_expires_order . $nl;
+                  $out .= "Membership expires updated: " . $membership_expires_updated . " - " . date('d/m/Y H:i:s', $membership_expires_updated) . $nl; 
+                  }
 					}
                
                
@@ -611,7 +628,7 @@ if ( is_admin() )
    }
 
 function woo_member_register_settings() { // whitelist options
-  register_setting( 'Woo-membership', 'woo_member_magic_product_ids' );
+  register_setting( 'Woo-member', 'woo_member_magic_product_ids' );
   register_setting( 'Woo-member', 'woo_member_disable_redirect' );
   register_setting( 'Woo-member', 'woo_member_debug' );
 }
@@ -632,6 +649,9 @@ function woo_member_admin_menu() {
 
 function woo_member_admin_page(){
    global $nl;
+   
+   
+   
 	?>
 	<div class="wrap">
 		<h2>WooCommerce membership by role configuration</h2>
