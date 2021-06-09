@@ -19,7 +19,6 @@ defined('ABSPATH') or die("No script kiddies please!");
  // search on SET THE PRODUCT IDS to find/change the magic membership id
 
 $woo_member_magic_product_ids    = get_option( 'woo_member_magic_product_ids' );
-$woo_member_disable_redirect     = get_option( 'woo_member_disable_redirect'  );
 $woo_member_debug                = get_option( 'woo_member_debug'  );
 
 
@@ -105,7 +104,6 @@ function woo_postpay_membership2($orderid)
    {
 	global $nl;
 	global $woo_member_magic_product_ids;
-   global $woo_member_disable_redirect;
    global $woo_member_debug;
    
    $out = "in Woo postpay membership2:" . $nl;
@@ -629,7 +627,6 @@ if ( is_admin() )
 
 function woo_member_register_settings() { // whitelist options
   register_setting( 'Woo-member', 'woo_member_magic_product_ids' );
-  register_setting( 'Woo-member', 'woo_member_disable_redirect' );
   register_setting( 'Woo-member', 'woo_member_debug' );
 }
 
@@ -666,23 +663,18 @@ function woo_member_admin_page(){
 		  <table class="form-table" border=0>
 
         <tr valign="top">
-        <th scope="row">"Magic" product IDs:</th>
+        <th scope="row">"Magic" product ID:</th>
         <td><input type="text" size=50 name="woo_member_magic_product_ids" value="<?php echo esc_attr( get_option('woo_member_magic_product_ids') ); ?>" /><br>
-        (Single value or comma-separated list of product IDs to trigger adding a membership
+        (Single value for now but implement for comma-separated list of product IDs to trigger adding a membership - look to duration attribute for length)
         </td>
         </tr>
 
-        <tr valign="top">
-        <th scope="row">Disable redirect after processing</th>
-        <td><input type="checkbox" name="woo_member_disable_redirect" <?php if ( esc_attr( get_option('woo_member_disable_redirect') ) == "on" ) { echo "checked"; }; ?> /><br>
-        Enable this to allow further checkout postpay processes, which use the "woocommerce_thankyou" action/hook, to happen rather than redirecting to the order summary page
-        </td>
-        </tr>
         
         <tr valign="top">
         <th scope="row">Show debug info</th>
-        <td><input type="checkbox" name="woo_member_debug" <?php if ( esc_attr( get_option('woo_member_debug') ) == "on" ) { echo "checked"; }; ?> /><br>
-        Should be disabled unless trying to trace an error.
+        <td><input type="checkbox" name="woo_member_debug" <?php if ( esc_attr( get_option('woo_member_debug') ) == "on" ) { echo "checked"; }; ?> />
+        &nbsp;
+        Should be disabled unless trying to trace an error. Do this as a label!
         </td>
         </tr>
         
@@ -694,7 +686,6 @@ function woo_member_admin_page(){
 	<?php
 
    echo "woo_member_magic_product_ids: "              . get_option( 'woo_member_magic_product_ids' )  . $nl;
-   echo "woo_member_disable_redirect: "               . get_option( 'woo_member_disable_redirect' )   . $nl;
    echo "woo_member_debug: "                          . get_option( 'woo_member_debug' )              . $nl;
 
   
