@@ -20,7 +20,7 @@ defined('ABSPATH') or die("No script kiddies please!");
 
 $woo_member_magic_product_ids    = get_option( 'woo_member_magic_product_ids' );
 $woo_member_debug                = get_option( 'woo_member_debug'  );
-
+$woo_member_ignore_webhooks      = get_option( 'woo_member_ignore_webhooks');
 
 $nl = "<BR>";
 $wmdbg = false;
@@ -29,71 +29,71 @@ $wmdbg = false;
 if ( $woo_member_debug == "on" )
    { $wmdbg = true; }
 
-// Remove billing phone (and set email field class to wide)
-add_filter( 'woocommerce_billing_fields', 'remove_billing_fields', 20, 1 );
-function remove_billing_fields($fields) {
-   $fields ['billing_last_name']['required'] = false; // To be sure "NOT required"
-   $fields ['billing_first_name']['label'] = "Name"; // To be sure "NOT required"
-   $fields ['billing_phone']['required'] = false; // To be sure "NOT required"
-   $fields ['billing_company']['required'] = false; // To be sure "NOT required"
-   $fields ['billing_address_1']['required'] = false; // To be sure "NOT required"
-   $fields ['billing_address_2']['required'] = false; // To be sure "NOT required"
-   $fields ['billing_city']['required'] = false; // To be sure "NOT required"
-   $fields ['billing_postcode']['required'] = false; // To be sure "NOT required"
-   $fields ['billing_state']['required'] = false; // To be sure "NOT required"
-   $fields ['billing_country']['required'] = false; // To be sure "NOT required"
-   $fields ['order_comments']['required'] = false; // To be sure "NOT required"
-   
-   unset( $fields ['billing_last_name'] ); // Remove billing phone field
-   unset( $fields ['billing_phone'] ); // Remove billing phone field
-   unset( $fields ['billing_company'] ); // Remove billing phone field
-   unset( $fields ['billing_address_1'] ); // Remove billing phone field
-   unset( $fields ['billing_address_2'] ); // Remove billing phone field
-   unset( $fields ['billing_city'] ); // Remove billing phone field
-   unset( $fields ['billing_postcode'] ); // Remove billing phone field
-   unset( $fields ['billing_state'] ); // Remove billing phone field
-   unset( $fields ['order_comments'] ); // Remove billing phone field
-   
-   $fields ['billing_email']['class'] = array('form-row-wide'); // Make the field wide
-
-   
-   return $fields;
-}
-
-
-// Remove shipping phone (optional)
-add_filter( 'woocommerce_shipping_fields', 'remove_shipping_fields', 20, 1 );
-function remove_shipping_fields($fields) {
-   $fields ['shipping_last_name']['required'] = false; // To be sure "NOT required"
-   $fields ['shipping_phone']['required'] = false; // To be sure "NOT required"
-   $fields ['shipping_company']['required'] = false; // To be sure "NOT required"
-   $fields ['shipping_address_1']['required'] = false; // To be sure "NOT required"
-   $fields ['shipping_address_2']['required'] = false; // To be sure "NOT required"
-   $fields ['shipping_city']['required'] = false; // To be sure "NOT required"
-   $fields ['shipping_postcode']['required'] = false; // To be sure "NOT required"
-   $fields ['shipping_state']['required'] = false; // To be sure "NOT required"
-   $fields ['shipping_country']['required'] = false; // To be sure "NOT required"
-   
-   unset( $fields ['shipping_phone'] ); // Remove shipping phone field
-   unset( $fields ['shipping_company'] ); // Remove shipping phone field
-   unset( $fields ['shipping_address_1'] ); // Remove shipping phone field
-   unset( $fields ['shipping_address_2'] ); // Remove shipping phone field
-   unset( $fields ['shipping_city'] ); // Remove shipping phone field
-   unset( $fields ['shipping_postcode'] ); // Remove shipping phone field
-   unset( $fields ['billing_state'] ); // Remove billing phone field
-   
-   return $fields;
-}
-
-
-
-//add_filter( 'woocommerce_checkout_fields', 'remove_additional_billing_fields', 20, 1 );
-function remove_additional_billing_fields($fields) {
-   //$fields ['order_comments']['required'] = false; // To be sure "NOT required"
-   //unset( $fields ['order_comments'] ); // Remove billing phone field
-   unset( $fields['order']['order_comments']);
-   return $fields;
-}
+//// Remove billing phone (and set email field class to wide)
+//add_filter( 'woocommerce_billing_fields', 'remove_billing_fields', 20, 1 );
+//function remove_billing_fields($fields) {
+//   $fields ['billing_last_name']['required'] = false; // To be sure "NOT required"
+//   $fields ['billing_first_name']['label'] = "Name"; // To be sure "NOT required"
+//   $fields ['billing_phone']['required'] = false; // To be sure "NOT required"
+//   $fields ['billing_company']['required'] = false; // To be sure "NOT required"
+//   $fields ['billing_address_1']['required'] = false; // To be sure "NOT required"
+//   $fields ['billing_address_2']['required'] = false; // To be sure "NOT required"
+//   $fields ['billing_city']['required'] = false; // To be sure "NOT required"
+//   $fields ['billing_postcode']['required'] = false; // To be sure "NOT required"
+//   $fields ['billing_state']['required'] = false; // To be sure "NOT required"
+//   $fields ['billing_country']['required'] = false; // To be sure "NOT required"
+//   $fields ['order_comments']['required'] = false; // To be sure "NOT required"
+//   
+//   unset( $fields ['billing_last_name'] ); // Remove billing phone field
+//   unset( $fields ['billing_phone'] ); // Remove billing phone field
+//   unset( $fields ['billing_company'] ); // Remove billing phone field
+//   unset( $fields ['billing_address_1'] ); // Remove billing phone field
+//   unset( $fields ['billing_address_2'] ); // Remove billing phone field
+//   unset( $fields ['billing_city'] ); // Remove billing phone field
+//   unset( $fields ['billing_postcode'] ); // Remove billing phone field
+//   unset( $fields ['billing_state'] ); // Remove billing phone field
+//   unset( $fields ['order_comments'] ); // Remove billing phone field
+//   
+//   $fields ['billing_email']['class'] = array('form-row-wide'); // Make the field wide
+//
+//   
+//   return $fields;
+//}
+//
+//
+//// Remove shipping phone (optional)
+//add_filter( 'woocommerce_shipping_fields', 'remove_shipping_fields', 20, 1 );
+//function remove_shipping_fields($fields) {
+//   $fields ['shipping_last_name']['required'] = false; // To be sure "NOT required"
+//   $fields ['shipping_phone']['required'] = false; // To be sure "NOT required"
+//   $fields ['shipping_company']['required'] = false; // To be sure "NOT required"
+//   $fields ['shipping_address_1']['required'] = false; // To be sure "NOT required"
+//   $fields ['shipping_address_2']['required'] = false; // To be sure "NOT required"
+//   $fields ['shipping_city']['required'] = false; // To be sure "NOT required"
+//   $fields ['shipping_postcode']['required'] = false; // To be sure "NOT required"
+//   $fields ['shipping_state']['required'] = false; // To be sure "NOT required"
+//   $fields ['shipping_country']['required'] = false; // To be sure "NOT required"
+//   
+//   unset( $fields ['shipping_phone'] ); // Remove shipping phone field
+//   unset( $fields ['shipping_company'] ); // Remove shipping phone field
+//   unset( $fields ['shipping_address_1'] ); // Remove shipping phone field
+//   unset( $fields ['shipping_address_2'] ); // Remove shipping phone field
+//   unset( $fields ['shipping_city'] ); // Remove shipping phone field
+//   unset( $fields ['shipping_postcode'] ); // Remove shipping phone field
+//   unset( $fields ['billing_state'] ); // Remove billing phone field
+//   
+//   return $fields;
+//}
+//
+//
+//
+////add_filter( 'woocommerce_checkout_fields', 'remove_additional_billing_fields', 20, 1 );
+//function remove_additional_billing_fields($fields) {
+//   //$fields ['order_comments']['required'] = false; // To be sure "NOT required"
+//   //unset( $fields ['order_comments'] ); // Remove billing phone field
+//   unset( $fields['order']['order_comments']);
+//   return $fields;
+//}
 
 
 
@@ -106,7 +106,7 @@ function woo_postpay_membership2($orderid)
 	global $woo_member_magic_product_ids;
    global $woo_member_debug;
    
-   $out = "in Woo postpay membership2:" . $nl;
+   //$out = "in Woo postpay membership2:" . $nl;
 	
 	//$orderid = "";
 	
@@ -144,9 +144,15 @@ function woo_postpay_membership2($orderid)
          
          if ( $product_id == $magic_id )  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< HERE IS WHEREYOU SET THE PRODUCT IDS WHIC ARE SPECIAL/MEMBERSHIPS
              {
-            $out .= "Product is a membership, get duration and add to user field" . $nl;
+            $out .= "Product is a membership, get duration and add to user field" . $nl . $nl;
             $userid = get_current_user_id();
-            $out .= "Current user ID: " . $userid . $nl;
+            $out .= "Current user ID: " . $userid . $nl . $nl;
+            
+            if ( $userid == 0 )
+               {
+               echo "Missing user ID, form cannot complete. Please email support" . $nl;
+               return;
+               }
             
             // see if there's an existing expiry date
             $membership_expires = get_user_meta($userid, 'membership_expires', true);
@@ -156,21 +162,22 @@ function woo_postpay_membership2($orderid)
             $out .= "Membership expires: " . $membership_expires . " - " . date('d/m/Y H:i:s', $membership_expires) . $nl;
             $out .= "Membership expires order: " . $membership_expires_order . $nl;
             $out .= "Membership expires updated: " . $membership_expires_updated . " - " . date('d/m/Y H:i:s', $membership_expires_updated) . $nl;
-            
+            $out .= $nl;
             
             $product = apply_filters( 'woocommerce_order_item_product', $order->get_product_from_item( $item ), $item );
             
             $duration_days = $product->get_attribute( 'duration_days' );
             $out .= "Duration_days: " . $duration_days . $nl;
-            
+            $out .= $nl;
             
             if ($membership_expires <> "" && $membership_expires_order <> "" && $membership_expires_updated <> "" )
                {
-               $out .= "There's already a membership expires date, check it's not a duplicate and then add to it and updated the order & updated date" . $nl;
+               $out .= "There's already a membership expires date, check it's not a duplicate and then add to it and update the order & updated date." . $nl;
+               $out .= $nl;
                //update_user_meta( $userid, 'membership_expires', 'herp de flerp' );
                if ($membership_expires_order < $orderid)
 						{
-						$out .= "This looks to be an additional renewal, extend the previous epiry date" . $nl;
+						$out .= "This looks to be an additional renewal, extend the previous expiry date" . $nl;
 						$current_time = time();
 						$current_expires_time = $membership_expires;
 						$out .= "Current membership expiry time: " . $current_expires_time . $nl;
@@ -194,12 +201,12 @@ function woo_postpay_membership2($orderid)
 						$out .= "Membership expires: " . $membership_expires . " - " . date('d/m/Y H:i:s', $membership_expires) . $nl;
 						$out .= "Membership expires order: " . $membership_expires_order . $nl;
 						$out .= "Membership expires updated: " . $membership_expires_updated . " - " . date('d/m/Y H:i:s', $membership_expires_updated) . $nl; 
-
+                  $out .= $nl;
 						
 						}
 					else
 						{
-						$out .= "This expiry date looks to already have been set for this orderid or is a duplicate. Ignore" . $nl;
+						$out .= "This expiry date looks to already have been set for this orderid or is a duplicate. Ignore" . $nl . $nl;
 						}
 					
 					
@@ -212,8 +219,10 @@ function woo_postpay_membership2($orderid)
                $current_time = time();
                $out .= "Current time: " . $current_time . $nl;
                $out .= "Current time (readable): " . date('d/m/Y H:i:s', $current_time) . $nl;
+               $out .= $nl;
                
                $out .= "Duration to add: " . $duration_days . $nl;
+               $out .= $nl;
                
                if ( !is_numeric($duration_days) )
                   {
@@ -247,13 +256,13 @@ function woo_postpay_membership2($orderid)
 			$out .= nf_woo_update_membership($userid) . $nl;
 			
 			
-			$product = apply_filters( 'woocommerce_order_item_product', $order->get_product_from_item( $item ), $item );
-			$out .= $product->get_image();
+			//$product = apply_filters( 'woocommerce_order_item_product', $order->get_product_from_item( $item ), $item );
+			//$out .= $product->get_image();
 			
 			//Get the WC_Product object
-			$product = $item->get_product();
+			//$product = $item->get_product();
 			//$out .=  "description/fuid: " . $product->get_description() . $nl;
-			$fuid = $product->get_description();
+			//$fuid = $product->get_description();
 			
 			//print_r($product) . $nl;
 			
@@ -275,7 +284,7 @@ function woo_postpay_membership2($orderid)
 			
 			//Get the product SKU (using WC_Product method)
 			//$sku = $product->get_sku();
-			$out .= $nl . $nl;
+			//$out .= $nl;
 			}
 		}
 	return $out;
@@ -329,6 +338,8 @@ function nf_woo_membership_status($atts,$content = null)
 	//$out .= "Membership status:" . $nl;
 	//$out .= "Is user logged in: " . $isloggedin . $nl;
 	
+   $has_manual_premium = "";
+   
 	if (!$isloggedin)
 		{
 		$out .= "Please <a href=\"/wp-login.php\">log in</a> to see membership status" . $nl;	
@@ -344,6 +355,18 @@ function nf_woo_membership_status($atts,$content = null)
 			{
 			$userid = get_current_user_id();
 			
+         $has_manual_premium = nf_woo_user_has_role($userid, "manual_premium");
+         $has_premium = nf_woo_user_has_role($userid, "premium_subscriber");
+         $out .= "Has premium: " . $has_premium . $nl;
+         $out .= "Has manual premium: " . $has_manual_premium . $nl;
+         
+         
+         if ( $has_premium && $has_manual_premium )
+            {
+            $out .= "Your account has manually set premium permissions, so will not expire." . $nl;
+            return do_shortcode($out);
+            }
+         
 			$membership_expires = get_user_meta($userid, 'membership_expires', true);
 			$membership_expires_order = get_user_meta($userid, 'membership_expires_order', true);
 			$membership_expires_updated = get_user_meta($userid, 'membership_expires_updated', true);
@@ -383,7 +406,18 @@ function nf_woo_membership_status($atts,$content = null)
    
    
    
-   
+
+function nf_woo_user_has_role($user_id, $role_or_cap) {
+
+    $u = new \WP_User( $user_id );
+    //$u->roles Wrong way to do it as in the accepted answer.
+    $roles_and_caps = $u->get_role_caps(); //Correct way to do it as wp do multiple checks to fetch all roles
+
+    if( isset ( $roles_and_caps[$role_or_cap] ) and $roles_and_caps[$role_or_cap] === true )
+       {
+           return true;
+       }
+ }   
    
    
    
@@ -401,7 +435,7 @@ function nf_woo_update_membership($userid)
    if ($wmdbg) { $out .= "Debug: " . $wmdbg . $nl; }
    if ($wmdbg) { $out .= "IN WOO UPDATE MEMBERSHIP" . $nl; }
 	
-	$out .= "UserID: " . $userid . $nl;
+	$out .= "<b>UserID: " . $userid . "</b>" . $nl;
 	
 	$current_time = time();
 	if ($wmdbg)
@@ -438,15 +472,18 @@ function nf_woo_update_membership($userid)
 	
 	
 	$ispremium = false;
-	
+   
+   $out .= $nl;
+   $out .= "<b>Checking it's all set corrrectly:</b>" . $nl;
+   
 	if ($expires_diff > 0)
 		{
-		$out .= "User has days remaining as premium member, check roles are correct" . $nl;
+		$out .= "User has days remaining as premium member, check roles are correct:" . $nl;
 		$setpremium = true;
 		}
 	else
 		{
-		$out .= "User does not have days remaining as premium member, check roles are correct" . $nl;
+		$out .= "User does not have days remaining as premium member, check roles are correct:" . $nl;
 		$setpremium = false;
 		}
 	
@@ -464,9 +501,9 @@ function nf_woo_update_membership($userid)
 			}
 		}
 	
-	$out .= "Is user currently premium (by role)?: " . $ispremium . $nl;
+	$out .= "- Is user currently premium (by role)?: " . $ispremium . $nl;
 	
-	$out .= "Should user be premium?: " . $setpremium . $nl;
+	$out .= "- Should user be premium?: " . $setpremium . $nl;
 	
 	$u = new WP_User($userid);
 
@@ -477,11 +514,17 @@ function nf_woo_update_membership($userid)
 	if ($ispremium)
 		{
 		if ($setpremium)
-			{ $out .= "Nothing to do, user is already premium and should be. All good" . $nl; }
+			{ $out .= $nl . "Nothing to do, user is already premium and should be. All good" . $nl; }
 		else
 			{
-			$out .= "Remove premium role" . $nl;
+			$out .= $nl . "Remove premium role" . $nl;
 			$u->remove_role( 'premium_subscriber' );
+         
+         $has_subscriber = nf_woo_user_has_role($userid, "subscriber");
+         if ( !$has_subscriber )
+            {
+            $u->add_role( 'subscriber' );   
+            }
 			}
 		}
 	else
@@ -553,34 +596,59 @@ add_action( 'woocommerce_thankyou', 'redirectcustom', 10);
 function redirectcustom( $order_id )
 	{
 	global $nl;
+   global $woo_member_ignore_webhooks;   
 	$order = wc_get_order( $order_id );
    //echo $nl . "ATTEMPTING TO DO THE MEMBERSHIP STUFF" . $nl . $nl;
    
    //$url = '/wptest/?page_id=595&orderid=' . $order_id;
    $url = "/my-account/view-order/" . $order_id;
    
+   $userid = get_current_user_id();
+   $out .= "Current user ID: " . $userid . $nl . $nl;
+   
+   if ( $userid == 0 )
+      {
+      echo "Missing user ID, form cannot complete. Please email support" . $nl;
+      return;
+      }
+   
    //if ( $order->status != 'failed' ) {
-	if ( $order->status == 'completed' )
+	if ( $order->status == 'completed' || $order->status == 'processing' || $woo_member_ignore_webhooks)
+                                         // added "processing" bit for ccbill compatibility
 		{
-		echo "DO THE MEMBERSHIP STUFF" . $nl;
-      echo "Order id: " . $order_id . $nl;
+       
+      if ( $woo_member_ignore_webhooks )
+         {
+         echo "Marking order as paid (ignore webhooks)" . $nl . $nl;
+         $order->set_status('processing');
+         $order->save();        
+         }
+		//echo "DOING THE MEMBERSHIP STUFF" . $nl;
+      //echo "Processing order id: " . $order_id . $nl;
       $out = woo_postpay_membership2($order_id);
       echo $out;
-      echo "The above would normally happen silently and then you'd be redirected to the url below: " . $nl;
-      echo "<a href=\"" . $url . "\">HERE</a>" . $nl;
+      echo "<center><img src=\"/wp-content/plugins/woocommerce-membership-by-role/waiting_icon.gif\" style=\"width: 96px;\"></center>";
+      echo $nl;
+      echo "<center style=\"font-size: 20px; \">If you are not forwarded automatically, please click: ";
+      echo "<a href=\"" . $url . "\">HERE</a></center>" . $nl;
       echo "<br><br>";
       echo "</div></div>";
+      echo "
+<script language=javascript>
+setTimeout(\"location.href = '" . $url . "'\", 1500);
+</script>";
+      
       //echo "</body></html>";
       //wp_safe_redirect( $url );
       //exit;
 		}
 	else
 		{
-		//echo "<div style=\"background-color: #ffffffff; padding: 12px;\">";
-		//echo "ORDER STATUS: " . $order->status . $nl;
-		//echo "Once this order is set to completed you will be able to download your clips.<br>You can refresh this page if you need to. It should take you to the order once it's approved.". $nl;
-		//echo "</div>";
-		//echo $nl;
+		echo "<div style=\"background-color: #ffffffff; padding: 12px;\">";
+		echo "ORDER STATUS: " . $order->status . $nl;
+		echo "Once this order is set to completed you will be able to download your clips.<br>You can refresh this page if you need to. It should take you to the order once it's approved.". $nl;
+      echo "</div>";
+		echo $nl;
 		}
 	}
 
@@ -589,7 +657,16 @@ function redirectcustom( $order_id )
 
 
 
-
+add_action('woocommerce_order_details_after_order_table', 'action_order_details_after_order_table', 10, 4 );
+function action_order_details_after_order_table( $order, $sent_to_admin = '', $plain_text = '', $email = '' ) {
+    // Only on "My Account" > "Order View"
+    if ( is_wc_endpoint_url( 'view-order' ) ) {
+        //printf( '<p class="custom-text">' .
+        //__("To cancel your license within the 30 day trial period click on %s" ,"woocommerce"),
+        //'<strong>"' .__("Refund my entire order", "woocommerce") . '"</strong>.</p>' );
+       printf("<div style=\"font-size: 18px; font-weight: bold; \">You can check the status and how long you've got left of your membership at any time by going to the <a href=\"/membership\">Membership status</a> page from the \"My account\" menu item.</div><br><br>");
+    }
+}
 
 
 
@@ -628,6 +705,7 @@ if ( is_admin() )
 function woo_member_register_settings() { // whitelist options
   register_setting( 'Woo-member', 'woo_member_magic_product_ids' );
   register_setting( 'Woo-member', 'woo_member_debug' );
+  register_setting( 'Woo-member', 'woo_member_ignore_webhooks' );
 }
 
 //add_action( 'admin_menu', 'botfink_admin_menu' );
@@ -678,7 +756,15 @@ function woo_member_admin_page(){
         </td>
         </tr>
         
-
+        
+        <tr valign="top">
+        <th scope="row">Ignore CCbill webhooks</th>
+        <td><input type="checkbox" name="woo_member_ignore_webhooks" <?php if ( esc_attr( get_option('woo_member_ignore_webhooks') ) == "on" ) { echo "checked"; }; ?> />
+        &nbsp;
+        Don't rely on webhooks from CCbill to set order status, order status is set to processing by the checkout process.
+        </td>
+        </tr>
+        
     </table>
 		<?php submit_button(); ?>
       </form>
@@ -687,6 +773,7 @@ function woo_member_admin_page(){
 
    echo "woo_member_magic_product_ids: "              . get_option( 'woo_member_magic_product_ids' )  . $nl;
    echo "woo_member_debug: "                          . get_option( 'woo_member_debug' )              . $nl;
+   echo "woo_member_ignore_webhooks: "                . get_option( 'woo_member_ignore_webhooks' )    . $nl;
 
   
 }
