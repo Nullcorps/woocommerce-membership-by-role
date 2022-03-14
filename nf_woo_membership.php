@@ -21,6 +21,8 @@ defined('ABSPATH') or die("No script kiddies please!");
 $woo_member_magic_product_ids    = get_option( 'woo_member_magic_product_ids' );
 $woo_member_debug                = get_option( 'woo_member_debug'  );
 $woo_member_ignore_webhooks      = get_option( 'woo_member_ignore_webhooks');
+$woo_member_check_users_pwd      = get_option( 'woo_member_check_users_pwd' );
+
 
 $nl = "<BR>";
 $wmdbg = false;
@@ -706,6 +708,8 @@ function woo_member_register_settings() { // whitelist options
   register_setting( 'Woo-member', 'woo_member_magic_product_ids' );
   register_setting( 'Woo-member', 'woo_member_debug' );
   register_setting( 'Woo-member', 'woo_member_ignore_webhooks' );
+  register_setting( 'Woo-member', 'woo_member_check_users_pwd' );
+  
 }
 
 //add_action( 'admin_menu', 'botfink_admin_menu' );
@@ -724,9 +728,7 @@ function woo_member_admin_menu() {
 
 function woo_member_admin_page(){
    global $nl;
-   
-   
-   
+
 	?>
 	<div class="wrap">
 		<h2>WooCommerce membership by role configuration</h2>
@@ -764,7 +766,36 @@ function woo_member_admin_page(){
         Don't rely on webhooks from CCbill to set order status, order status is set to processing by the checkout process.
         </td>
         </tr>
+
+        <tr valign="top">
+        <th scope="row">Password for "check users" page:</th>
+        <td><input type="text" size=50 name="woo_member_check_users_pwd" value="<?php echo esc_attr( get_option('woo_member_check_users_pwd') ); ?>" /><br>
+        The password to use to allow automated access to the check_users page, to allow automating the downgrading of expired users.<br>
+        <br>
+        <strong><u>IMPORTANT: Make this password LONG since it's the only protection for that page - like 30-40 alphanumeric characters</u></strong>
+        <br><br>
+        You can use <a href="https://www.strongpasswordgenerator.org/" target="_blank">this site</a> to generate a strong password.<br>
+        <br>
+        Recommended settings:<br>
+        - "Include alpha<br>
+        - Include lower<br>
+        - Include number<br>
+        - DO NOT include symbol (as it will likely break the password because of character encoding<br>
+        - Length: 30-40 characters
         
+        To allow checking all users, make a new page and add a "custom html" block and add the following shortcode: [nf_woo_check_all_users]<br><br>
+        
+        To automate checking, set up a web-cron (e.g. from montastic.com which is free) to run e.g. one a week and hit the url of your chcking page,
+        but add ?p=thepasswordyouenteredinthisfield to the end of the url.<br><br>
+        
+        So fo example you url ought to look a bit like this: https://yoursite.com/check-users?p=we9u34rj4fojifioje4ioerfioerfuhi<Br><Br>
+        
+        You can check whether it's working ok by opening a private browsing window (or log out so you're not admin) and hit that url, it should show you the check_users page.<br><br>
+        
+        If you remove the p=sfsdffsds bit or change it, it ought to show "page restricted".
+        </td>
+        </tr>
+      
     </table>
 		<?php submit_button(); ?>
       </form>
@@ -774,10 +805,130 @@ function woo_member_admin_page(){
    echo "woo_member_magic_product_ids: "              . get_option( 'woo_member_magic_product_ids' )  . $nl;
    echo "woo_member_debug: "                          . get_option( 'woo_member_debug' )              . $nl;
    echo "woo_member_ignore_webhooks: "                . get_option( 'woo_member_ignore_webhooks' )    . $nl;
+   echo "woo_member_check_users_pwd: "                . get_option( 'woo_member_check_users_pwd' )    . $nl;
 
-  
+   
+   
 }
 
 
 
 
+
+
+
+
+
+add_shortcode('nf_woo_check_all_users','nf_woo_check_all_users');
+function nf_woo_check_all_users($atts,$content = null)
+   {
+   global $nl;
+   global $wmdbg;
+   global $woo_member_check_users_pwd;
+
+   $wmdbg = 1;
+   $out = "";
+   
+   //$out .= "stored pwd: " . $woo_member_check_users_pwd . $nl;   
+   $pwd = "";
+   if ( isset($_GET['p']) )
+      { $pwd = sanitize_text_field($_GET['p']); }
+   
+   $currentisadmin = nf_woo_is_user_admin();
+   //$out .= "Current user is admin: " . $currentisadmin . $nl;
+   
+   if ( $currentisadmin || ($woo_member_check_users_pwd <> "" && $pwd == $woo_member_check_users_pwd) )
+      {
+      $out .= "Current user is admin or password matched" . $nl . $nl; 
+      }
+   else
+      {
+      $out .= "Sorry this page is restricted";
+      return $out;
+      }
+   
+   $out .= "Check all users, find those who are premium_subscriber but not admin or manual_premium: " . $nl;
+   $out .= $nl;
+
+   $users = get_users();
+   
+   foreach ( $users as $user )
+      {
+      //$out .= "<pre>" . print_r($user->data, true) . "</pre>";
+      //$out .= "<pre>" . print_r($user->roles, true) . "</pre>";
+      
+      $ispremium = false;
+      $ismanualpremium = false;
+      $isadmin = false;
+      
+      foreach ( $user->roles as $role )
+         {
+         //$out .= $role . $nl;
+         if ( $role == "administrator" )
+            { $isadmin = true; }
+         if ( $role == "premium_subscriber" )
+            { $ispremium = true; }
+         if ( $role == "manual_premium" )
+            { $ismanualpremium = true; }
+         }
+      
+      if ( $ispremium && !$isadmin && !$ismanualpremium )
+         {
+         $userid = $user->data->ID;      
+         
+         //$out .= "Do the thing" . $nl;
+         //$out .= "<pre>" . print_r($user, true) . "</pre>";
+         //$out .= $nl;
+         
+         $out .= "UserID: " . $userid . $nl;
+         $out .= "Username: " . $user->data->user_login . $nl;
+         $out .= "User email: " . $user->data->user_email . $nl;
+         
+         
+         $membership_expires = get_user_meta($userid, 'membership_expires', true);
+         $membership_expires_order = get_user_meta($userid, 'membership_expires_order', true);
+         $membership_expires_updated = get_user_meta($userid, 'membership_expires_updated', true);
+         
+         
+         if ($wmdbg)
+            {
+            $out .= "Membership expires: " . $membership_expires . " - " . date('d/m/Y H:i:s', $membership_expires) . $nl;
+            $out .= "Membership expires order: " . $membership_expires_order . $nl;
+            $out .= "Membership expires updated: " . $membership_expires_updated . " - " . date('d/m/Y H:i:s', $membership_expires_updated) . $nl; 
+            }
+         else
+            {
+            $out .= "Membership expires: " . date('d/m/Y H:i:s', $membership_expires) . $nl;
+            $out .= "Membership expires order: " . $membership_expires_order . $nl;
+            $out .= "Membership expires updated: " . date('d/m/Y H:i:s', $membership_expires_updated) . $nl; 
+            }
+         
+         if ( strval($membership_expires) <> "" && strval($membership_expires_order) <> "" && strval($membership_expires_order) <> "" )
+            {
+            $out .= "Found all the required membership expiry stuff, should be ok to process" . $nl;
+            $out .= nf_woo_update_membership($userid);
+            }
+         else
+            {
+            $out .= "<span style=\"color: red; font-weight: bold;\">This order appears to be missing membership expires stuff, please review manually. SKIPPING PROCESSING</span>" . $nl;
+            }
+         
+         $out .= $nl . $nl;
+         
+         }
+      }   
+   
+   
+   //$out .= "<pre>" . print_r($users, true) . "</pre>";
+   
+   
+   // users who have customer role
+   // who are not admin
+   
+   // check status and modify as needed
+   
+   
+   // add a password to admin settings so we can cron this page
+   
+   return $out;
+   }
